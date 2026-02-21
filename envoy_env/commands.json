@@ -1,0 +1,9 @@
+{
+    "branch_status": {
+        "description": "Prints out the rev-list of each git repo with matching branch name",
+        "environment": [
+            "python_env.json"
+        ],
+        "alias": ["python", "-m", "gt.gitutils.tools.branch_status"]
+    }
+}
