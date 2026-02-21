@@ -9,3 +9,4 @@ from ._str_functions import *
 from ._subproc_functions import *
 from ._system_functions import *
 from ._user_functions import *
+from ._user_paths import *
