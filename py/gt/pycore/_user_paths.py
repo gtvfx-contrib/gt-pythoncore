@@ -110,6 +110,6 @@ def userLogPathLocal(appName: str, *subDirs: str) -> Path:
     
     """
     result = ensurePath(
-        Path(LOCAL_ROOT.user_data_path, "log", appName, *subDirs)
+        Path(LOCAL_ROOT.user_log_path, "log", appName, *subDirs)
     )
     return result if isinstance(result, Path) else Path(result)

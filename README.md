@@ -175,7 +175,7 @@ NET_STORAGE_MAP={"\\\\server\\share": "S:"}
 |---|---|
 | `robocopy` | Python wrapper around Windows `robocopy` |
 | `rmdir` | Recursively remove a directory tree |
-| `pruneDirectories` | Delete empty directories under a root |
+| `pruneDirectories` | Keep the most recent `max_num_dirs` directories (by mtime) under a root and delete the rest |
 
 #### Archive functions
 
@@ -190,7 +190,7 @@ Requires 7-Zip to be on `PATH` or installed at the default location.
 
 | Symbol | Description |
 |---|---|
-| `managedOutput` | Redirect or suppress stdout/stderr |
+| `managedOutput` | Capture stdout/stderr to a temporary location and then copy it to an output path (optionally clearing the destination first) |
 | `mappedDrive` | Temporarily map a UNC path to a drive letter via `net use` |
 | `retry` | Iterable that drives a retry loop via a `for` / `with` pattern |
 
@@ -298,7 +298,7 @@ class MyApi(BaseInterface):
 
 | Symbol | Description |
 |---|---|
-| `FileVersion` | Dataclass holding `major`, `minor`, `patch`, `build` version components |
+| `FileVersion` | Dataclass holding `major`, `minor`, `subminor`, `revision` version components |
 | `getFileVersion` | Read the `FileVersion` from a PE binary via `win32api` |
 
 ---

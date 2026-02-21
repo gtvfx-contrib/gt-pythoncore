@@ -132,17 +132,21 @@ def managedOutput(output_path: str, clear_output: bool = True) -> Generator[str,
         ensurePath(temp_output_path)
     
     if clear_output:
-        # Event to signal when the directory removal is complete
+        # Event to signal when the directory or file removal is complete
         removal_complete = threading.Event()
         
         def remove_previous_output():
-            if os.path.isdir(temp_output_path) and os.path.exists(output_path):
+            if os.path.exists(output_path):
                 # Clear the final output path before we copy our data there
-                print("Removing previous output directory...")
-                rmdir(output_path)
+                if os.path.isdir(output_path):
+                    print("Removing previous output directory...")
+                    rmdir(output_path)
+                else:
+                    print("Removing previous output file...")
+                    os.remove(output_path)
             removal_complete.set()
         
-        # Start the thread to remove the previous output directory
+        # Start the thread to remove the previous output path
         removal_thread = threading.Thread(target=remove_previous_output)
         removal_thread.start()
     

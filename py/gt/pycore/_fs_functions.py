@@ -32,7 +32,11 @@ def pruneDirectories(root: str, max_num_dirs: int = 5) -> None:
         None
     
     """
-    root_dirs = [os.path.join(root, d) for d in os.listdir(root)]
+    root_dirs = [
+        os.path.join(root, d)
+        for d in os.listdir(root)
+        if os.path.isdir(os.path.join(root, d))
+    ]
     root_dirs.sort(key=os.path.getmtime, reverse=True) # latest to oldest
     for i, folder in enumerate(root_dirs):
         if i < max_num_dirs:
@@ -110,7 +114,10 @@ def robocopy(src: str, dst: str,
         
     if unique_log_file:
         fpath, ext = os.path.splitext(log_file)
-        log_file = os.path.join(fpath, f"_{getTimecodeVersion()}{ext}")
+        dirpath = os.path.dirname(fpath)
+        basename = os.path.basename(fpath)
+        unique_name = f"{basename}_{getTimecodeVersion()}{ext}"
+        log_file = os.path.join(dirpath, unique_name) if dirpath else unique_name
     
     cmd.append(f"/LOG:{log_file}")
     

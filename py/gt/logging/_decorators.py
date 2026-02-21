@@ -25,7 +25,7 @@ def logFunc(force=False):
                     # This means we're in a python REPL
                     module_path = from_module
                 else:
-                    module_path = makeRelativePath(from_module, relative_token="t2")
+                    module_path = makeRelativePath(from_module, relative_token="gt")
                 
                 msg = f"call: {module_path} | {func.__name__}("
                 if args:
