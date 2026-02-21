@@ -34,7 +34,7 @@ def detectEncoding(file_path: str) -> Optional[str]:
 def confirmGet(default: Any=None):
     """Supplies a default return value to the wrapped method.
     
-    Default value is returned if either section or option queired don't exist
+    Default value is returned if either section or option queried don't exist
     and a fallback arg is not supplied.
     
     Args:
@@ -49,7 +49,7 @@ def confirmGet(default: Any=None):
         def _wrapper(self, *args, **kwargs):
             """Decorator to confirm the section and option exist before calling
             the method. If the section or option does not exist, it returns the
-            fallback value provided to the method or the suppied default value.
+            fallback value provided to the method or the supplied default value.
             
             """
             # Check if the section and option exist before calling the method
