@@ -1,0 +1,6 @@
+{
+    "+=PYTHONPATH": "{$__BUNDLE__}/py",
+    "NET_STORAGE_MAP": {
+        "//THO_CLOUD/gavyn": "R:"
+    }
+}
