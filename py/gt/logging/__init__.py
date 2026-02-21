@@ -1,3 +1,3 @@
-"""Entrypoint for t2.logging"""
+"""Entrypoint for gt.logging"""
 from ._decorators import *
 from ._functions import *
