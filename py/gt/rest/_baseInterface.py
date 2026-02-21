@@ -30,7 +30,7 @@ class BaseInterface(metaclass=ABCSingleton):
     
     ## Example:
     ```python
-    from t2.rest import BaseInterface
+    from gt.rest import BaseInterface
     
     class WoWCreator(BaseInterface):
         def __init__(self, port: int = 6014) -> None:
