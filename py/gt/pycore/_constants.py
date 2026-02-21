@@ -53,13 +53,15 @@ def _getNetStorageMap() -> dict:
     if not raw:
         return {}
     try:
-        return json.loads(raw)
+        raw_map = json.loads(raw)
     except json.JSONDecodeError:
-        pass
-    try:
-        return ast.literal_eval(raw)
-    except (ValueError, SyntaxError):
-        return {}
+        try:
+            raw_map = ast.literal_eval(raw)
+        except (ValueError, SyntaxError):
+            return {}
+    # Normalize keys to the OS path separator so that entries written with
+    # forward slashes (e.g. "//server/share") match correctly on Windows.
+    return {os.path.normpath(k): v for k, v in raw_map.items()}
 
 
 LOCAL_ROOT: PlatformDirsABC = _getLocalRoot()

@@ -285,6 +285,10 @@ def uncToMappedDrive(path: str) -> str:
     Checks the static ``NET_STORAGE_MAP`` configuration first, then falls back
     to querying Windows for any currently active drive mappings.
 
+    Keys in ``NET_STORAGE_MAP`` may be written with forward slashes
+    (``//server/share``) or backslashes; both are normalised at load time so
+    matching is reliable on Windows.
+
     Args:
         path (str): The UNC path to convert.
 
@@ -293,23 +297,32 @@ def uncToMappedDrive(path: str) -> str:
             path unchanged.
 
     """
-    path = os.path.normpath(path)
+    normalised = Path(os.path.normpath(path))
 
-    if not path.startswith("\\\\"):
+    if not str(normalised).startswith("\\\\"):
         # Not a UNC path – nothing to convert.
-        return path
+        return str(normalised)
+
+    def _try_map(mappings: dict) -> str | None:
+        for unc_prefix, drive_letter in mappings.items():
+            try:
+                relative = normalised.relative_to(Path(unc_prefix))
+                return str(Path(drive_letter) / relative)
+            except ValueError:
+                continue
+        return None
 
     # 1. Check the static config map.
-    for unc, driveletter in NET_STORAGE_MAP.items():
-        if path.startswith(unc):
-            return path.replace(unc, driveletter, 1)
+    result = _try_map(NET_STORAGE_MAP)
+    if result is not None:
+        return result
 
     # 2. Fall back to currently active Windows drive mappings.
-    for unc, driveletter in getActiveDriveMappings().items():
-        if path.startswith(unc):
-            return path.replace(unc, driveletter, 1)
+    result = _try_map(getActiveDriveMappings())
+    if result is not None:
+        return result
 
-    return path
+    return str(normalised)
 
 
 @timeIt
