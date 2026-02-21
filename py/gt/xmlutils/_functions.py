@@ -157,7 +157,7 @@ def _indent(elem, _level=0, _moreSibs=False):
             from. Likely the root of your XML tree
         _level=0 (int): Controls how many tabs to use for each child
         _moreSibs=False (bool): This is queried during recursion and makes
-            different indentaiton if True than when False.
+            different indentation if True than when False.
     
     Returns:
         None
