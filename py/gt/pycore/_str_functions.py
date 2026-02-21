@@ -24,7 +24,7 @@ def isMatch(match, word, ignoreCase=True, switch=False):
         word (str | list): The objects to check for a match
         ignoreCase (bool): Optional, ignore case when checking for match
         switch (bool): Optional, switch the search between 'match' and 'word'.
-            Only applicable when seaching a list.
+            Only applicable when searching a list.
     
     Returns:
         bool
