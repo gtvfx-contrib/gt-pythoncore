@@ -286,7 +286,9 @@ Base classes for building REST API clients.
 from gt.rest import BaseInterface
 
 class MyApi(BaseInterface):
-    BASE_URL = "https://api.example.com"
+    @property
+    def base_url(self) -> str:
+        return "https://api.example.com"
 
     def get_items(self):
         return self.get("/items")
