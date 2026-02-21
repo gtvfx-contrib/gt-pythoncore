@@ -232,7 +232,7 @@ def rmdir(path: str,
                                f"code {result.returncode}")
     except RuntimeError as e:
         if _except:
-            raise RuntimeError from e
+            raise e
         
         # There are seemingly different permissions between UNC paths and drive
         # letter mappings. Where we might get an Access Denied error on a UNC
@@ -247,4 +247,4 @@ def rmdir(path: str,
             # call the decorated function so we get one time for the original call
             rmdir.__wrapped__(path, _except=True) # type: ignore
         else:
-            raise RuntimeError from e
+            raise e
