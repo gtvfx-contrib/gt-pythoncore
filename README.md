@@ -8,7 +8,7 @@ in `requirements.txt`.
 
 ## Requirements
 
-- **Python 3.9+**
+- **Python 3.10+**
 - **Windows** — several modules (`gt.win32`, `gt.winreg`, `gt.winmessages`,
   UNC path helpers) depend on Win32 APIs and will not run on other platforms.
   Pure-utility modules (`gt.pycore`, `gt.config`, `gt.xmlutils`, etc.) are
