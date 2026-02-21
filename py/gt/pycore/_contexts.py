@@ -1,11 +1,13 @@
 """General python context managers"""
+from __future__ import annotations
 
 __all__ = [
     "managedOutput",
     "mappedDrive",
-    "retryContext"
+    "retry"
 ]
 
+import logging
 import os
 import subprocess
 import tempfile
@@ -14,7 +16,9 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
-from typing import Generator, Optional
+from collections.abc import Callable, Generator
+
+log = logging.getLogger(__name__)
 
 from ._fs_functions import robocopy, rmdir
 from ._path_functions import ensurePath, uncToMappedDrive
@@ -84,7 +88,7 @@ def mappedDrive(unc_path: str) -> Generator[str, None, None]:
 
     # net use prints: "Drive X: is now connected to \\server\share."
     output = result.stdout.decode()
-    drive_letter: Optional[str] = None
+    drive_letter: str | None = None
     for token in output.split():
         if len(token) == 2 and token[1] == ":" and token[0].isalpha():
             drive_letter = token.upper()
@@ -108,7 +112,7 @@ def mappedDrive(unc_path: str) -> Generator[str, None, None]:
 
 
 @contextmanager
-def managedOutput(output_path: str, clear_output: bool=True) -> Generator[str, None, None]:
+def managedOutput(output_path: str, clear_output: bool = True) -> Generator[str, None, None]:
     """Context manager that writes output to a local temp location and then
     copies the local output to the initial supplied output location.
     
@@ -158,79 +162,110 @@ def managedOutput(output_path: str, clear_output: bool=True) -> Generator[str, N
         rmdir(temp_dir)
         
     
-@contextmanager
-def retryContext(retries=3, retry_delay=10, exceptions=None, handler=None):
-    """Context manager to retry logic a specified number of times.
+class _Attempt:
+    """Single attempt produced by :class:`retry`.
+
+    Used as a context manager inside the ``for attempt in retry(...):`` loop.
+    Suppresses any exception from the ``with`` body so the outer loop can
+    inspect it and decide whether to sleep-and-retry or re-raise.
+    """
+
+    def __init__(self) -> None:
+        self.exception: BaseException | None = None
+
+    def __enter__(self) -> _Attempt:
+        self.exception = None
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object,
+    ) -> bool:
+        if exc_val is not None:
+            self.exception = exc_val
+        return exc_val is not None  # always suppress so the generator resumes
+
+
+class retry:
+    """Iterable that drives a retry loop via a ``for`` / ``with`` pattern.
+
+    Retrying only a targeted section of a function (rather than the whole
+    thing) is achieved by placing the ``with attempt:`` block around just
+    the code that may fail::
+
+        for attempt in retry(retries=3, retry_delay=2, exceptions=ConnectionError):
+            with attempt:
+                result = risky_operation()
+
+    The loop exits as soon as the ``with`` block completes without an
+    exception.  On failure the generator sleeps for ``retry_delay`` seconds
+    and yields the next attempt.  After all attempts are exhausted the
+    original exception is re-raised.
 
     Args:
-        retries (int): Number of retry attempts.
-        retry_delay (int): Time to wait between retries in seconds.
-        exceptions (Exception or tuple of Exceptions, optional): Exception(s) 
-            to catch and retry on. Defaults to RuntimeError if None.
-        handler (callable, optional): Custom exception handler with signature 
-            (exception, attempt, retries) -> bool
-            Returns True to retry, False to re-raise immediately.
-
-    Yields:
-        None
+        retries (int): Maximum number of attempts (default ``3``).
+        retry_delay (int): Seconds to wait between attempts (default ``10``).
+        exceptions (type or tuple of types, optional): Exception type(s) to
+            catch and retry on.  Defaults to ``RuntimeError``.
+        handler (callable, optional): Custom exception handler with signature
+            ``(exception, attempt_number, total_retries) -> bool``.  Return
+            ``True`` to retry, ``False`` to re-raise immediately.
 
     Raises:
-        The last exception caught after all retry attempts fail.
-        
-    Example handlers:
-    ```python
-    def keyErrorHandler(e, attempt, retries):
-        '''Custom handler for KeyError exceptions'''
-        if isinstance(e, KeyError) and e.args[0] != 'www-authenticate':
-            # Don't retry for KeyErrors that aren't 'www-authenticate'
-            return False
-        print(f"Authentication error, retrying ({attempt}/{retries})...")
-        return True
-        
-    # For more complex error handling
-    def advancedErrorHandler(e, attempt, retries):
-        '''Advanced error handling with different behaviors based on exception type'''
-        if isinstance(e, ConnectionError):
-            print(f"Connection error on attempt {attempt}/{retries}, retrying...")
-            return True
-        elif isinstance(e, TimeoutError):
-            # Only retry timeouts twice
-            if attempt < 2:
-                print(f"Timeout on attempt {attempt}/{retries}, retrying...")
-                return True
-            return False
-        elif isinstance(e, KeyError):
-            if e.args[0] == 'www-authenticate':
-                print(f"Authentication error on attempt {attempt}/{retries}, "
-                      f"retrying...")
-                return True
-            return False
-        return True  # Default: retry other exceptions
-    ```
-        
-    """
-    # Default to RuntimeError if no exceptions specified
-    if exceptions is None:
-        exceptions = RuntimeError
+        The last caught exception once all attempts are exhausted.
 
-    for attempt in range(retries):
-        try:
-            yield
-            break
-        except exceptions as e:
-            # Use the last attempt
-            is_last_attempt = attempt == retries - 1
-            
-            # Handle the exception with custom handler if provided
-            if handler is not None:
-                should_retry = handler(e, attempt + 1, retries)
-                if not should_retry or is_last_attempt:
+    Usage with a custom handler::
+
+        def _handler(e, attempt, retries):
+            if isinstance(e, KeyError) and e.args[0] != 'www-authenticate':
+                return False  # don't retry
+            log.warning("Auth error on attempt %d/%d", attempt, retries)
+            return True
+
+        for attempt in retry(retries=3, exceptions=KeyError, handler=_handler):
+            with attempt:
+                token = fetch_token()
+
+    """
+
+    def __init__(
+        self,
+        retries: int = 3,
+        retry_delay: int = 10,
+        exceptions: type[BaseException] | tuple[type[BaseException], ...] | None = None,
+        handler: Callable | None = None,
+    ) -> None:
+        self._retries = retries
+        self._retry_delay = retry_delay
+        self._exceptions = exceptions if exceptions is not None else RuntimeError
+        self._handler = handler
+
+    def __iter__(self) -> Generator[_Attempt, None, None]:
+        for attempt_num in range(self._retries):
+            is_last = attempt_num == self._retries - 1
+            attempt = _Attempt()
+            yield attempt
+
+            if attempt.exception is None:
+                return  # success — stop iterating
+
+            e = attempt.exception
+
+            # Re-raise immediately if it's not a type we were asked to catch.
+            if not isinstance(e, self._exceptions):
+                raise e
+
+            if self._handler is not None:
+                should_retry = self._handler(e, attempt_num + 1, self._retries)
+                if not should_retry or is_last:
                     raise e
-            else:
-                # Default handling
-                if is_last_attempt:
-                    raise e
-                print(f"Request failed: {str(e)}. Retrying in {retry_delay} "
-                      f"seconds... (Attempt {attempt + 1}/{retries})")
-                
-            time.sleep(retry_delay)
+            elif is_last:
+                raise e
+
+            log.warning(
+                "Attempt %d/%d failed: %s. Retrying in %ds...",
+                attempt_num + 1, self._retries, e, self._retry_delay,
+            )
+            time.sleep(self._retry_delay)

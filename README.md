@@ -192,7 +192,15 @@ Requires 7-Zip to be on `PATH` or installed at the default location.
 |---|---|
 | `managedOutput` | Redirect or suppress stdout/stderr |
 | `mappedDrive` | Temporarily map a UNC path to a drive letter via `net use` |
-| `retryContext` | Retry a block of code on exception with configurable back-off |
+| `retry` | Iterable that drives a retry loop via a `for` / `with` pattern |
+
+```python
+from gt.pycore import retry
+
+for attempt in retry(retries=3, retry_delay=2, exceptions=ConnectionError):
+    with attempt:
+        result = fetch_data()  # only this block is retried
+```
 
 ```python
 from gt.pycore import mappedDrive
