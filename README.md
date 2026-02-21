@@ -247,7 +247,7 @@ with mappedDrive(r"\\server\share") as drive:
 
 | Symbol | Description |
 |---|---|
-| `processProcStdOutput` | Stream and log stdout/stderr from a `subprocess.Popen` object |
+| `processSubprocessOutput` | Stream and log stdout/stderr from a `subprocess.Popen` object |
 
 ---
 

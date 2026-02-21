@@ -1,7 +1,7 @@
 """Subprocess handling utilities."""
 
 __all__ = [
-    "processProcStdOutput"
+    "processSubprocessOutput"
 ]
 
 from typing import Optional, Union, Sequence
@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 
-def processProcStdOutput(
+def processSubprocessOutput(
     stdout: Union[bytes, str],
     returncode: int,
     process_name: str = 'Process',
