@@ -44,7 +44,7 @@ def createRoot(tag, **kwargs):
     
 
 def createSubelement(element, tag, **kwargs):
-    """Create a child element of the inputed element
+    """Create a child element of the input element
     
     Args:
         element (ET.Element): The parent element to create your element under
