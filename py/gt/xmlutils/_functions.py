@@ -87,7 +87,7 @@ def filterNodeList(nodeList, **kwargs):
     
     Args:
         nodeList (list): list of ET.Element nodes
-        **kwargs: key/value pairs to match agains the node.attrib dict
+        **kwargs: key/value pairs to match against the node.attrib dict
     
     Returns:
         (list)
@@ -118,7 +118,7 @@ def find(element, tag, **kwargs):
     Args:
         element (ET.Element): The element to search beneath
         tag (str): The tag of the elment you wish to find
-        **kwargs: key/value pairs to match agains the node.attrib dict
+        **kwargs: key/value pairs to match against the node.attrib dict
 
     Returns:
         (list)
@@ -138,7 +138,7 @@ def findRecursive(element, tag, **kwargs):
     Args:
         element (ET.Element): The element to search beneath
         tag (str): The tag of the elment you wish to find
-        **kwargs: key/value pairs to match agains the node.attrib dict
+        **kwargs: key/value pairs to match against the node.attrib dict
 
     Returns:
         (list)
