@@ -30,9 +30,9 @@ def userConfigPathLocal(appName: str, *subDirs: str) -> Path:
     will create subdirectories under the config location.
         
     Examples:
-        >>> from t2.pycore import userConfigPathLocal
+        >>> from gt.pycore import userConfigPathLocal
         >>> userConfigPathLocal('Foo', 'Bar')
-        Path("%LOCALAPPDATA%/bliz/t2/config/Foo/Bar")
+        Path("%LOCALAPPDATA%/bliz/gt/config/Foo/Bar")
     
     Args:
         appName (str): The associated application or tool name.
@@ -64,9 +64,9 @@ def userDataPathLocal(appName: str, *subDirs: str) -> Path:
     location.
     
     Examples:
-        >>> from t2.pycore import userDataPathLocal
+        >>> from gt.pycore import userDataPathLocal
         >>> userDataPathLocal('wowcreator', 'scripts', 'awesome')
-        Path("%LOCALAPPDATA%/bliz/t2/data/wowcreator/scripts/awesome")
+        Path("%LOCALAPPDATA%/bliz/gt/data/wowcreator/scripts/awesome")
         
     Args:
         appName (str): The associated application or tool name.
@@ -97,9 +97,9 @@ def userLogPathLocal(appName: str, *subDirs: str) -> Path:
     location.
    
     Examples:
-        >>> from t2.pycore import userLogPathLocal
+        >>> from gt.pycore import userLogPathLocal
         >>> userLogPathLocal('wowcreator', 'restapi')
-        Path("%LOCALAPPDATA%/bliz/t2/log/wowcreator/restapi")
+        Path("%LOCALAPPDATA%/bliz/gt/log/wowcreator/restapi")
     
     Args:
         appName (str): The associated application or tool name.

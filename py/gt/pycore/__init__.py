@@ -1,4 +1,4 @@
-"""Entry point for t2.pycore"""
+"""Entry point for gt.pycore"""
 from ._archive_functions import *
 from ._constants import *
 from ._contexts import *
