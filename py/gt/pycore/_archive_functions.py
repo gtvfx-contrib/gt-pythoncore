@@ -90,7 +90,7 @@ def compressFiles(src: str, dst: str, compression_level: int = 5,
 
     # Execute the 7-Zip command
     log.info("Compressing files...")
-    result = subprocess.run(cmd, check=False)
+    result = subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     if result.returncode != 0:
         raise RuntimeError("Compression failed: {}".format(result.stderr.decode()))
@@ -128,7 +128,7 @@ def extractArchive(src: str, dst: str) -> None:
 
     # Execute the 7-Zip command
     log.info("Extracting files...")
-    result = subprocess.run(cmd, check=False)
+    result = subprocess.run(cmd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     
     if result.returncode != 0:
         raise RuntimeError("Extraction failed: {}".format(result.stderr.decode()))
