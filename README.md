@@ -335,7 +335,7 @@ Full read/write access to the Windows Registry.
 
 ### `gt.xmlutils`
 
-Thin helpers around `xml.etree.ElementTree`.
+Thin helpers around `xml.etree.cElementTree`.
 
 | Symbol | Description |
 |---|---|
