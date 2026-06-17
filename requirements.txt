@@ -1,0 +1,27 @@
+# Requirements for gt.pythoncore
+# Maintain this file alongside the codebase as dependencies are added or removed.
+
+# HTTP / REST
+requests
+
+# Progress bars (used in copytreeWithProgress)
+tqdm
+
+# Terminal colors (used in gt.repl)
+colorama
+
+# Git introspection (used in gt.gitutils)
+gitpython
+
+# CLI argument parsing (used in gt.gitutils.tools.branch_status)
+click
+
+# Platform-appropriate directories (used in gt.pycore._constants)
+platformdirs
+
+# Character encoding detection (used in gt.config._configparser)
+chardet
+
+# Windows API bindings (used in gt.win32, gt.pycore._path_functions, gt.pycore._user_functions)
+# Provides: win32api, win32com, win32net, pywintypes
+pywin32
