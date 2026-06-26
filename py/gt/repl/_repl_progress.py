@@ -5,14 +5,14 @@ import colorama
 
 colorama.init(autoreset=True)
 
-_COLOR_MAP: dict[str, str] = {
-    "red":     colorama.Fore.RED,
-    "green":   colorama.Fore.GREEN,
-    "yellow":  colorama.Fore.YELLOW,
-    "blue":    colorama.Fore.BLUE,
+_COLOR_MAP: dict[str, str] = { # type: ignore
+    "red": colorama.Fore.RED, 
+    "green": colorama.Fore.GREEN,
+    "yellow": colorama.Fore.YELLOW,
+    "blue": colorama.Fore.BLUE,
     "magenta": colorama.Fore.MAGENTA,
-    "cyan":    colorama.Fore.CYAN,
-    "white":   colorama.Fore.WHITE,
+    "cyan": colorama.Fore.CYAN,
+    "white": colorama.Fore.WHITE,
 }
 
 

@@ -18,14 +18,14 @@ import logging
 import winreg
 
 from functools import cache
-from typing import Optional, Dict, List, Tuple, Any, Union
+from typing import Optional, Any, Union
 
 
 log = logging.getLogger(__name__)
 
 
 
-def registryKeyExists(reg_path: Tuple[int, str]) -> bool:
+def registryKeyExists(reg_path: tuple[int, str]) -> bool:
     """Check if a registry key exists."""
     try:
         with winreg.OpenKey(*reg_path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY):
@@ -35,11 +35,11 @@ def registryKeyExists(reg_path: Tuple[int, str]) -> bool:
 
 
 @cache
-def getRegistryValue(reg_path: Tuple[int, str], value_name: str) -> Optional[Any]:
+def getRegistryValue(reg_path: tuple[int, str], value_name: str) -> Optional[Any]:
     """Get a single registry value.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         value_name: Name of the value to retrieve
         
     Returns:
@@ -55,11 +55,11 @@ def getRegistryValue(reg_path: Tuple[int, str], value_name: str) -> Optional[Any
 
 
 @cache
-def getRegistryValues(reg_path: Tuple[int, str]) -> Optional[Dict[str, Any]]:
+def getRegistryValues(reg_path: tuple[int, str]) -> Optional[dict[str, Any]]:
     """Get all values from a registry key.
 
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         
     Returns:
         Dictionary of value_name: value_data pairs, or None if key not found
@@ -84,14 +84,14 @@ def getRegistryValues(reg_path: Tuple[int, str]) -> Optional[Dict[str, Any]]:
         return None
 
 
-def getRegistrySubkeys(reg_path: Tuple[int, str]) -> Optional[List[str]]:
+def getRegistrySubkeys(reg_path: tuple[int, str]) -> Optional[list[str]]:
     """Get all subkey names from a registry key.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         
     Returns:
-        List of subkey names, or None if key not found
+        list of subkey names, or None if key not found
         
     """
     try:
@@ -113,11 +113,11 @@ def getRegistrySubkeys(reg_path: Tuple[int, str]) -> Optional[List[str]]:
         return None
 
 
-def getRegistryKeyInfo(reg_path: Tuple[int, str]) -> Optional[Dict[str, Union[Dict[str, Any], List[str]]]]:
+def getRegistryKeyInfo(reg_path: tuple[int, str]) -> Optional[dict[str, Union[dict[str, Any], list[str]]]]:
     """Get complete information about a registry key (values and subkeys).
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         
     Returns:
         Dictionary with 'values' and 'subkeys' keys, or None if key not found
@@ -153,11 +153,11 @@ def getRegistryKeyInfo(reg_path: Tuple[int, str]) -> Optional[Dict[str, Union[Di
 
 
 @cache
-def getRegistryValuesDetailed(reg_path: Tuple[int, str]) -> Optional[Dict[str, Dict[str, Any]]]:
+def getRegistryValuesDetailed(reg_path: tuple[int, str]) -> Optional[dict[str, dict[str, Any]]]:
     """Get all values from a registry key with detailed type information.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         
     Returns:
         Dictionary with detailed value info, or None if key not found
@@ -199,7 +199,7 @@ def _getRegistryTypeName(reg_type: int) -> str:
     return type_names.get(reg_type, f"UNKNOWN_TYPE_{reg_type}")
 
 
-def _clearRegistryCache(reg_path: Tuple[int, str]) -> None:
+def _clearRegistryCache(reg_path: tuple[int, str]) -> None:
     """Clear cached registry values for the given path."""
     try:
         getRegistryValue.cache_clear()
@@ -209,12 +209,12 @@ def _clearRegistryCache(reg_path: Tuple[int, str]) -> None:
         pass  # No cache to clear
 
 
-def setRegistryValue(reg_path: Tuple[int, str], value_name: str, value_data: Any, 
+def setRegistryValue(reg_path: tuple[int, str], value_name: str, value_data: Any, 
                      value_type: int = winreg.REG_SZ) -> bool:
     """Set a registry value, creating the key if it doesn't exist.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         value_name: Name of the value to set
         value_data: Data to store in the value
         value_type: Registry data type (defaults to REG_SZ)
@@ -245,11 +245,11 @@ def setRegistryValue(reg_path: Tuple[int, str], value_name: str, value_data: Any
         return False
 
 
-def setRegistryValueString(reg_path: Tuple[int, str], value_name: str, value_data: str) -> bool:
+def setRegistryValueString(reg_path: tuple[int, str], value_name: str, value_data: str) -> bool:
     """Set a string registry value.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         value_name: Name of the value to set
         value_data: String data to store
         
@@ -260,11 +260,11 @@ def setRegistryValueString(reg_path: Tuple[int, str], value_name: str, value_dat
     return setRegistryValue(reg_path, value_name, value_data, winreg.REG_SZ)
 
 
-def setRegistryValueDWord(reg_path: Tuple[int, str], value_name: str, value_data: int) -> bool:
+def setRegistryValueDWord(reg_path: tuple[int, str], value_name: str, value_data: int) -> bool:
     """Set a DWORD registry value.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         value_name: Name of the value to set
         value_data: Integer data to store
         
@@ -275,11 +275,11 @@ def setRegistryValueDWord(reg_path: Tuple[int, str], value_name: str, value_data
     return setRegistryValue(reg_path, value_name, value_data, winreg.REG_DWORD)
 
 
-def deleteRegistryValue(reg_path: Tuple[int, str], value_name: str) -> bool:
+def deleteRegistryValue(reg_path: tuple[int, str], value_name: str) -> bool:
     """Delete a registry value.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         value_name: Name of the value to delete
         
     Returns:
@@ -299,11 +299,11 @@ def deleteRegistryValue(reg_path: Tuple[int, str], value_name: str) -> bool:
         return False
 
 
-def createRegistryKey(reg_path: Tuple[int, str]) -> bool:
+def createRegistryKey(reg_path: tuple[int, str]) -> bool:
     """Create a registry key.
     
     Args:
-        reg_path: Tuple of (root_key, subkey_path)
+        reg_path: tuple of (root_key, subkey_path)
         
     Returns:
         True if successful, False otherwise
